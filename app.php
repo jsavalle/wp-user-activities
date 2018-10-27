@@ -39,24 +39,22 @@ function WUA_Logs_login_activate() {
 }
 register_activation_hook( __FILE__, 'WUA_Logs_login_activate' );
 
-function WUA_Logs_event_record( $event_name ) {
+function WUA_Logs_logout_record( ) {
 
-    // Activation code here...
+
 		global $wpdb;
-		global $wp;
 
 		if (is_user_logged_in()){
 			error_log('WUALOG - Getting current user');
 
-			$current_slug = add_query_arg( array(), $wp->request );
-
 			$current_user = wp_get_current_user();
+
 			$log_login = $current_user->user_login;
 			$log_email = $current_user->user_email;
 			$log_fname = $current_user->user_firstname;
 			$log_lname = $current_user->user_lastname;
-			$log_event = $event_name;
-			$log_page = $current_slug;
+			$log_event = 'logout';
+
 			$log_site = get_bloginfo( 'url' );
 
 			$req = "INSERT INTO wua_loginlogs (
@@ -66,7 +64,6 @@ function WUA_Logs_event_record( $event_name ) {
 					email,
 					event,
 					site,
-					page,
 					loggedon
 				)
 				values (
@@ -76,7 +73,6 @@ function WUA_Logs_event_record( $event_name ) {
 					'$log_email',
 					'$log_event',
 					'$log_site',
-					'$log_page',
 					now()
 				);";
 
@@ -88,20 +84,43 @@ function WUA_Logs_event_record( $event_name ) {
 		}
 }
 
-function WUA_Logs_login_record (){
-	WUA_Logs_event_record( "init" );
-}
-
-add_action('init', 'WUA_Logs_login_record');
-
-function WUA_Logs_test_record (){
-	WUA_Logs_event_record( "test" );
-}
-
-add_action('set_current_user', 'WUA_Logs_test_record');
-
-function WUA_Logs_logout_record (){
-	WUA_Logs_event_record( "logout" );
-}
-
 add_action('wp_logout', 'WUA_Logs_logout_record');
+
+function WUA_Logs_login_record ($userlogin, $user){
+
+	global $wpdb;
+
+	error_log('WUALOG - Getting current user');
+
+	$current_user = wp_get_current_user();
+
+	$log_login = $user->user_login;
+	$log_email = $user->user_email;
+	$log_fname = $user->user_firstname;
+	$log_lname = $user->user_lastname;
+	$log_event = 'login';
+	$log_site = get_bloginfo( 'url' );
+
+	$req = "INSERT INTO wua_loginlogs (
+			firstname,
+			lastname,
+			username,
+			email,
+			event,
+			site,
+			loggedon
+		)
+		values (
+			'$log_fname',
+			'$log_lname',
+			'$log_login',
+			'$log_email',
+			'$log_event',
+			'$log_site',
+			now()
+		);";
+
+	$wpdb->query($req);
+
+}
+add_action('wp_login', 'WUA_Logs_login_record', 10, 2);
