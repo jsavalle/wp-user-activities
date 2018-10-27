@@ -1,4 +1,4 @@
-=== Hello Dolly ===
+=== WP User Activities ===
 Contributors: jsavalle
 Stable tag: 0.1
 Tested up to: 4.9.8
