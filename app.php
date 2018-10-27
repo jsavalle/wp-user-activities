@@ -4,7 +4,7 @@
  * @version 0.1
  */
 /*
-Plugin Name: Plop Login
+Plugin Name: WP Users Activities
 Plugin URI: NA
 Description: Log users login in a persistant forms for reporting
 Author: Johann Savalle
